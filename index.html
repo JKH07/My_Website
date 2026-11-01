@@ -208,8 +208,22 @@ const CONFIG = {
     "I'm a computer science master's student who likes turning ideas into tools people use.",
     "Outside of code I enjoy reading about science and learning languages.",
   ],
+
   SKILLS: ["React", "JavaScript", "Electron", "Capacitor", "Supabase", "Python", "SQL", "Pytorch"],
   // Add one block per job or internship. Empty the list and the section hides itself.
+  LINKS: [
+    { label: "LinkedIn", url: "https://www.linkedin.com/in/jana-harb-80b920348/", icon: "linkedin" },
+     { label: "Email", url: "janaharb8732@gmail.com", icon: "email" },
+  ],
+  // Hide these repos from the list (e.g. this site and the releases repo)
+  EXCLUDE: ["My_Website", "JKH07.github.io", "gemimi-releases"],
+  // Featured app card (needs a public repo with GitHub Releases). Leave "" to hide.
+  APP: {
+    NAME: "Gemimi",
+    DESC: "A cozy weekly planner with day notes, projects, a bulletin board and a little pet. Soft themes, synced across devices.",
+    RELEASES_REPO: "JKH07/gemimi-releases",
+    WEB_URL: "",       // optional web version
+  },
   EDUCATION: [
     {
       role: "Master's in Computer Science",
@@ -229,7 +243,7 @@ const CONFIG = {
     },
   ],
    WORK: [
-    EXPERIENCE: [
+   
   {
     role: "Intern",
     company: "IDS Fintech",
@@ -264,21 +278,9 @@ const CONFIG = {
     ],
   },
 ],
-  ],
+  
   // icon options: "linkedin", "email", "x", "link" (GitHub is added automatically)
-  LINKS: [
-    { label: "LinkedIn", url: "https://www.linkedin.com/in/jana-harb-80b920348/", icon: "linkedin" },
-    // { label: "Email", url: "mailto:you@example.com", icon: "email" },
-  ],
-  // Hide these repos from the list (e.g. this site and the releases repo)
-  EXCLUDE: ["My_Website", "JKH07.github.io", "gemimi-releases"],
-  // Featured app card (needs a public repo with GitHub Releases). Leave "" to hide.
-  APP: {
-    NAME: "Gemimi",
-    DESC: "A cozy weekly planner with day notes, projects, a bulletin board and a little pet. Soft themes, synced across devices.",
-    RELEASES_REPO: "JKH07/gemimi-releases",
-    WEB_URL: "",       // optional web version
-  },
+  
 };
 /* ========================================================================= */
 
