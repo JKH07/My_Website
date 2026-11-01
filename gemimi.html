@@ -219,7 +219,7 @@ footer a:hover{color:var(--accent);transform:translateY(-2px)}
         <h3>Meet your pet</h3>
         <div class="stage-wrap"><canvas id="stage" width="320" height="240" aria-label="Your pet. Click it to give it a pat."></canvas></div>
         <div class="pet-row">
-          <input type="text" id="petname" maxlength="16" value="Mochi" aria-label="Pet name" autocomplete="off">
+          <input type="text" id="petname" maxlength="16" value="Pookie" aria-label="Pet name" autocomplete="off">
           <button class="tb" type="button" id="pat">♥ Pat</button>
         </div>
         <div class="bond"><span id="bondlabel">♥ 0 / 10</span><span class="bar"><i id="bondbar"></i></span></div>
@@ -278,10 +278,12 @@ const CONFIG = {
      2. Fill in `src` below (e.g. "gemimi/week.png"). Add or remove blocks freely.
      3. Leave `src` as "" to show a placeholder card until you have the picture.        */
   SHOTS: [
-    { src: "", title: "Week view",       caption: "Your whole week, one task line at a time." },
-    { src: "", title: "Day notes",       caption: "A page for each day." },
-    { src: "", title: "Bulletin board",  caption: "Pin things you want to keep." },
+    { src: "weekview.png", title: "Week view",       caption: "Your whole week, one task line at a time." },
+    { src: "dayview.png", title: "Day notes",       caption: "A page for each day." },
+    { src: "bulletin.png", title: "Bulletin board",  caption: "Pin things you want to keep." },
     { src: "", title: "Pet & mini-games",caption: "Take a break and look after your pet." },
+    {src: "", title: "Year View",caption: "An overall look of how your emotions looked this year."},
+    {src: "", title: "Tier List and Entry Tracker",caption: "Just fun."},
   ],
 };
 /* ========================================================================= */
