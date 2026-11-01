@@ -146,7 +146,7 @@ footer a:hover{color:var(--accent);transform:translateY(-2px)}
     <a class="l" href="#about">About</a>
     <a class="l" href="#projects">Projects</a>
     <a class="l" href="#experience">Experience</a>
-    <a class="l" href="#education">Education</a>
+    <a class="l" href="#education">Education and Certifications</a>
     <a class="l" href="#research">Research</a>
     <a class="l" href="#links">Links</a>
     <button class="theme" id="theme" type="button" aria-label="Toggle light/dark"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 1 0 18z" fill="currentColor"/></svg></button>
@@ -222,7 +222,7 @@ const CONFIG = {
     "I'm a computer science master's student who likes turning ideas into tools people use.",
     "Outside of code I enjoy reading about science and learning languages.",
   ],
-  SKILLS: ["React", "JavaScript", "Electron", "Capacitor", "Supabase", "Python", "SQL", "Pytorch"],
+  SKILLS: ["React", "JavaScript", "Electron", "HSK3","Capacitor", "Supabase", "Python", "SQL", "Pytorch"],
   // One block per entry. Empty a list and its section hides itself.
   EDUCATION: [
     {
@@ -237,17 +237,15 @@ const CONFIG = {
       dates: "September 2023 – June 2026",
       points: ["GPA 3.86","AI and Data Science Focus"],
     },
+     {
+      role: "HSK 3",
+      company: "USJ",
+      dates: "March 2026",
+      points: ["Grade 293/300"],
+    },
   ],
   WORK: [
-    {
-      role: "Intern",
-      company: "IDS Fintech",
-      dates: "Month Year – Month Year",
-      points: [
-        "Helped migrate code from a c# desktop app to a react website.",
-        "React-VScode",
-      ],
-    },
+    
     {
       role: "Participant",
       company: "Semicolon Capture the Flag Competition",
@@ -258,13 +256,22 @@ const CONFIG = {
       role: "Volunteer",
       company: "LCPC",
       dates: "2025",
-      points: [""],
+     
     },
     {
       role: "Volunteer",
       company: "BAU Summer Camp",
       dates: "Summer Year 2025",
       points: ["Helped high school students learn about AI."],
+    },
+    {
+      role: "Intern",
+      company: "IDS Fintech",
+      dates: "3 months",
+      points: [
+        "Helped migrate code from a c# desktop app to a react website.",
+        "React-VScode",
+      ],
     },
   ],
 
