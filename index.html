@@ -142,8 +142,9 @@ footer a:hover{color:var(--accent);transform:translateY(-2px)}
   <nav class="bar">
     <a class="brand" href="#top" id="brand">Portfolio</a>
     <a class="l" href="#about">About</a>
-    <a class="l" href="#experience">Experience</a>
     <a class="l" href="#projects">Projects</a>
+    <a class="l" href="#experience">Experience</a>
+    <a class="l" href="#education">Education</a>
     <a class="l" href="#links">Links</a>
     <button class="theme" id="theme" type="button" aria-label="Toggle light/dark"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 1 0 18z" fill="currentColor"/></svg></button>
   </nav>
@@ -165,6 +166,7 @@ footer a:hover{color:var(--accent);transform:translateY(-2px)}
       <div class="chips" id="skills"></div>
     </div>
   </section>
+
   <section id="app" class="rv" hidden>
     <h2>Featured</h2>
     <div class="glass feature">
@@ -183,12 +185,16 @@ footer a:hover{color:var(--accent);transform:translateY(-2px)}
     <div class="repos" id="repos"><div class="glass sk"></div><div class="glass sk"></div><div class="glass sk"></div></div>
     <p class="note" id="repos-note"></p>
   </section>
+
   <section id="experience" class="rv" hidden>
     <h2>Experience</h2>
     <div class="exp" id="exp-list"></div>
   </section>
 
-  
+  <section id="education" class="rv" hidden>
+    <h2>Education</h2>
+    <div class="exp" id="edu-list"></div>
+  </section>
 
   <section id="links" class="rv">
     <h2>Find me</h2>
@@ -209,67 +215,55 @@ const CONFIG = {
     "Outside of code I enjoy reading about science and learning languages.",
   ],
   SKILLS: ["React", "JavaScript", "Electron", "Capacitor", "Supabase", "Python", "SQL", "Pytorch"],
-  // Add one block per job or internship. Empty the list and the section hides itself.
-  
+  // One block per entry. Empty a list and its section hides itself.
   EDUCATION: [
     {
       role: "Master's in Computer Science",
       company: "BAU",
       dates: "September 2026",
+      points: [],
+    },
+    {
+      role: "BSc. Computer Science",
+      company: "BAU",
+      dates: "September 2023 – June 2026",
+      points: ["GPA 3.86"],
+    },
+  ],
+  WORK: [
+    {
+      role: "Intern",
+      company: "IDS Fintech",
+      dates: "Month Year – Month Year",
       points: [
-        
+        "What you worked on or built.",
+        "Tools you used or what you learned.",
       ],
     },
     {
-      role: "Bsc. Computer Science",
-      company: "BAU",
-      dates: "September 2023 – June 2026",
-      points: [
-        "GPA 3.86"
-      ],
+      role: "Participant",
+      company: "Semicolon Capture the Flag Competition",
+      dates: "2025",
+      points: ["Which challenges you solved or how your team placed."],
+    },
+    {
+      role: "Volunteer",
+      company: "LCPC",
+      dates: "Month Year – Month Year",
+      points: ["What you helped with."],
+    },
+    {
+      role: "Volunteer",
+      company: "BAU Summer Camp",
+      dates: "Summer Year",
+      points: ["What you helped with."],
     },
   ],
-   WORK: [
-   
-  {
-    role: "Intern",
-    company: "IDS Fintech",
-    dates: "Month Year – Month Year",
-    points: [
-      "What you worked on or built.",
-      "Tools you used or what you learned.",
-    ],
-  },
-  {
-    role: "Participant",
-    company: "Semicolon Capture the Flag Competition",
-    dates: "2025",
-    points: [
-      "Which challenges you solved or how your team placed.",
-    ],
-  },
-  {
-    role: "Volunteer",
-    company: "LCPC",
-    dates: "Month Year – Month Year",
-    points: [
-      "What you helped with.",
-    ],
-  },
-  {
-    role: "Volunteer",
-    company: "BAU Summer Camp",
-    dates: "Summer Year",
-    points: [
-      "What you helped with.",
-    ],
-  },
-],
-  
+
   // icon options: "linkedin", "email", "x", "link" (GitHub is added automatically)
   LINKS: [
     { label: "LinkedIn", url: "https://www.linkedin.com/in/jana-harb-80b920348/", icon: "linkedin" },
-     { label: "Email", url: "janaharb8732@gmail.com", icon: "email" },
+    { label: "Email", url: "mailto:janaharb8732@gmail.com", icon: "email" },
   ],
   // Hide these repos from the list (e.g. this site and the releases repo)
   EXCLUDE: ["My_Website", "JKH07.github.io", "gemimi-releases"],
@@ -312,10 +306,11 @@ const links = [{ label: "GitHub", url: ghUrl, icon: "github" }, ...CONFIG.LINKS]
 $("link-list").innerHTML = links.map(iconLink).join("");
 $("hero-links").innerHTML = links.map(iconLink).join("");
 
-/* ---------- experience ---------- */
-if (CONFIG.EXPERIENCE && CONFIG.EXPERIENCE.length) {
-  $("experience").hidden = false;
-  $("exp-list").innerHTML = CONFIG.EXPERIENCE.map((j) => `
+/* ---------- experience + education ---------- */
+function renderJobs(secId, listId, items) {
+  if (!items || !items.length) return;
+  $(secId).hidden = false;
+  $(listId).innerHTML = items.map((j) => `
     <div class="glass job">
       <div class="top">
         <h3>${esc(j.role)} · <span class="co">${esc(j.company)}</span></h3>
@@ -324,6 +319,8 @@ if (CONFIG.EXPERIENCE && CONFIG.EXPERIENCE.length) {
       ${j.points?.length ? `<ul>${j.points.map((p) => `<li>${esc(p)}</li>`).join("")}</ul>` : ""}
     </div>`).join("");
 }
+renderJobs("experience", "exp-list", CONFIG.WORK);
+renderJobs("education", "edu-list", CONFIG.EDUCATION);
 
 /* ---------- theme toggle (remembered if storage works) ---------- */
 (function () {
@@ -356,7 +353,7 @@ document.addEventListener("pointermove", (e) => {
     const io = new IntersectionObserver((en) => en.forEach((x) => { if (x.isIntersecting) { x.target.classList.add("in"); io.unobserve(x.target); } }), { threshold: 0.08 });
     els.forEach((e) => io.observe(e));
   }
-  const ids = ["about", "experience", "projects", "links"], items = [...document.querySelectorAll("nav a.l")];
+  const ids = ["about", "projects", "experience", "education", "links"], items = [...document.querySelectorAll("nav a.l")];
   function upd() {
     let cur = "";
     ids.forEach((id) => { const s = $(id); if (s && !s.hidden && s.getBoundingClientRect().top < 160) cur = id; });
