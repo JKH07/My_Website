@@ -1,0 +1,360 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Portfolio</title>
+<meta name="description" content="Projects, writing and tools I've built.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='18' fill='%23a68be0'/><circle cx='32' cy='32' r='12' fill='%23fff' opacity='.85'/></svg>">
+<style>
+:root{
+  --bg:#fff9f6; --surface:#ffffff; --text:#3f3566; --muted:#857aa8; --line:#eadff7;
+  --accent:#8f72d8; --accent-ink:#fff; --soft:#f1eafb;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#14112a; --surface:#1d1838; --text:#ece6fa; --muted:#a095c8; --line:#37305e;
+    --accent:#b9a3e8; --accent-ink:#1b1630; --soft:#2a2347;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#14112a; --surface:#1d1838; --text:#ece6fa; --muted:#a095c8; --line:#37305e;
+  --accent:#b9a3e8; --accent-ink:#1b1630; --soft:#2a2347;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--text);font:16px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;overflow-x:hidden}
+#bg{position:fixed;inset:0;width:100vw;height:100vh;z-index:-1;display:block}
+.wrap{max-width:960px;margin:0 auto;padding:0 20px}
+a{color:var(--accent)}
+a:focus-visible,button:focus-visible{outline:3px solid var(--accent);outline-offset:3px;border-radius:8px}
+
+nav{display:flex;align-items:center;gap:6px;padding:18px 0}
+nav .brand{font-weight:800;letter-spacing:.2px;margin-right:auto;color:var(--text);text-decoration:none}
+nav a.l{color:var(--muted);text-decoration:none;padding:6px 10px;border-radius:10px;font-size:15px}
+nav a.l:hover{background:var(--soft);color:var(--text)}
+.theme{display:grid;place-items:center;padding:0;border:1px solid var(--line);background:var(--surface);color:var(--text);width:36px;height:36px;border-radius:10px;cursor:pointer;font-size:16px}
+@media(max-width:560px){nav a.l{display:none}}
+
+.glass{background:color-mix(in srgb,var(--surface) 72%,transparent);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:1px solid color-mix(in srgb,var(--line) 80%,transparent);border-radius:20px}
+
+.hero{padding:70px 0 30px}
+.hero .hi{color:color-mix(in srgb,var(--text) 75%,var(--muted));font-size:17px;margin:0 0 6px}
+.hero h1{font-size:clamp(38px,7vw,64px);line-height:1.05;margin:0 0 14px;letter-spacing:-1px}
+.hero h1 em{font-style:normal;color:var(--accent)}
+.hero p.tag{font-size:19px;color:color-mix(in srgb,var(--text) 75%,var(--muted));max-width:620px;margin:0 0 26px}
+.btns{display:flex;gap:10px;flex-wrap:wrap}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:12px 22px;border-radius:14px;font-weight:700;text-decoration:none;background:var(--accent);color:var(--accent-ink);box-shadow:0 8px 22px color-mix(in srgb,var(--accent) 30%,transparent);transition:transform .15s}
+.btn:hover{transform:translateY(-2px)}
+.btn.ghost{background:transparent;color:var(--text);border:1px solid var(--line);box-shadow:none}
+.btn[aria-disabled="true"]{opacity:.55;pointer-events:none}
+
+section{margin-top:64px}
+h2{font-size:24px;margin:0 0 18px;letter-spacing:-.3px}
+.about{padding:24px 26px}
+.about p{margin:0 0 12px;max-width:68ch}
+.about p:last-child{margin:0}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}
+.chip{padding:5px 13px;border-radius:999px;background:var(--soft);color:var(--text);font-size:14px;border:1px solid var(--line)}
+
+.feature{display:flex;gap:22px;align-items:center;padding:24px 26px;flex-wrap:wrap}
+.feature .logo{width:64px;height:64px;border-radius:18px;background:var(--accent);color:var(--accent-ink);display:grid;place-items:center;font-size:30px;font-weight:800;flex:none}
+.feature .txt{flex:1;min-width:220px}
+.feature h3{margin:0 0 4px;font-size:20px}
+.feature p{margin:0;color:var(--muted)}
+.feature .dls{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+.feature .dls a{padding:8px 14px;border-radius:12px;border:1px solid var(--line);background:var(--surface);color:var(--text);text-decoration:none;font-weight:600;font-size:14px}
+.feature .dls a:hover{border-color:var(--accent)}
+
+.filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
+.filters button{font:inherit;font-size:14px;padding:6px 14px;border-radius:999px;border:1px solid var(--line);background:color-mix(in srgb,var(--surface) 70%,transparent);color:var(--text);cursor:pointer}
+.filters button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.repos{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:14px}
+.repo{display:flex;flex-direction:column;gap:10px;padding:18px;text-decoration:none;color:inherit;transition:transform .15s,border-color .15s;min-height:150px}
+.repo:hover{transform:translateY(-3px);border-color:var(--accent)}
+.repo h3{margin:0;font-size:17px;overflow-wrap:anywhere;color:var(--text)}
+.repo p{margin:0;color:var(--muted);font-size:14.5px;flex:1}
+.meta{display:flex;gap:14px;flex-wrap:wrap;color:var(--muted);font-size:13px;align-items:center}
+.dot{width:10px;height:10px;border-radius:50%;display:inline-block;margin-right:5px;background:#b9a3e8}
+.topics{display:flex;gap:6px;flex-wrap:wrap}
+.topics span{font-size:12px;padding:2px 9px;border-radius:999px;background:var(--soft);color:var(--muted)}
+.sk{height:150px;opacity:.6;animation:pulse 1.4s ease-in-out infinite}
+@keyframes pulse{50%{opacity:.25}}
+@media(prefers-reduced-motion:reduce){.sk{animation:none}}
+.note{color:var(--muted)}
+
+.links{display:flex;gap:10px;flex-wrap:wrap}
+.links a{padding:10px 18px;border-radius:12px;border:1px solid var(--line);background:color-mix(in srgb,var(--surface) 72%,transparent);color:var(--text);text-decoration:none;font-weight:600}
+.links a:hover{border-color:var(--accent)}
+footer{margin:70px 0 36px;text-align:center;color:var(--muted);font-size:14px}
+[hidden]{display:none!important}
+</style>
+</head>
+<body>
+<canvas id="bg" aria-hidden="true"></canvas>
+
+<div class="wrap">
+  <nav>
+    <a class="brand" href="#top" id="brand">Portfolio</a>
+    <a class="l" href="#about">About</a>
+    <a class="l" href="#projects">Projects</a>
+    <a class="l" href="#links">Links</a>
+    <button class="theme" id="theme" type="button" aria-label="Toggle light/dark"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 1 0 18z" fill="currentColor"/></svg></button>
+  </nav>
+
+  <header class="hero" id="top">
+    <p class="hi" id="hi">Hi, I'm</p>
+    <h1 id="name"></h1>
+    <p class="tag" id="tagline"></p>
+    <div class="btns">
+      <a class="btn" href="#projects">See my projects</a>
+      <a class="btn ghost" id="gh-btn" href="#links" target="_blank" rel="noopener">GitHub ↗</a>
+    </div>
+  </header>
+
+  <section id="about" class="about-sec">
+    <h2>About</h2>
+    <div class="glass about">
+      <div id="about-text"></div>
+      <div class="chips" id="skills"></div>
+    </div>
+  </section>
+
+  <section id="app" hidden>
+    <h2>Featured</h2>
+    <div class="glass feature">
+      <div class="logo" aria-hidden="true">G</div>
+      <div class="txt">
+        <h3 id="app-name">Gemimi</h3>
+        <p id="app-desc"></p>
+        <div class="dls" id="app-dls"></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="projects">
+    <h2>Projects</h2>
+    <div class="filters" id="filters" role="group" aria-label="Filter by language" hidden></div>
+    <div class="repos" id="repos"><div class="glass sk"></div><div class="glass sk"></div><div class="glass sk"></div></div>
+    <p class="note" id="repos-note"></p>
+  </section>
+
+  <section id="links">
+    <h2>Find me</h2>
+    <div class="links" id="link-list"></div>
+  </section>
+
+  <footer><span id="foot"></span></footer>
+</div>
+
+<script>
+/* ============ EDIT THIS BLOCK ============================================ */
+const CONFIG = {
+  GITHUB_USER: "YOUR-GITHUB-USERNAME",
+  NAME: "Your Name",
+  TAGLINE: "I build small, careful software — and sometimes translate and write.",
+  ABOUT: [
+    "I'm a computer science master's student who likes turning ideas into tools people actually use: planners, games, and the occasional experiment.",
+    "Outside of code I read, write, and translate between English and Chinese.",
+  ],
+  SKILLS: ["React", "JavaScript", "Electron", "Capacitor", "Supabase", "Python", "Godot", "SQL"],
+  LINKS: [
+    // { label: "LinkedIn", url: "https://www.linkedin.com/in/…" },
+  ],
+  // Hide these repos from the list (e.g. this site and the releases repo)
+  EXCLUDE: ["YOUR-GITHUB-USERNAME.github.io", "gemimi-releases"],
+  // Featured app card (needs a public repo with GitHub Releases). Leave "" to hide.
+  APP: {
+    NAME: "Gemimi",
+    DESC: "A cozy weekly planner with day notes, projects, a bulletin board and a little pet. Soft themes, synced across devices.",
+    RELEASES_REPO: "", // e.g. "your-username/gemimi-releases"
+    WEB_URL: "",       // optional web version
+  },
+};
+/* ========================================================================= */
+
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const safeUrl = (u) => (/^https?:\/\//i.test(u || "") ? u : "");
+const placeholderUser = /YOUR-GITHUB/.test(CONFIG.GITHUB_USER);
+
+/* ---------- basic content ---------- */
+document.title = `${CONFIG.NAME} — Portfolio`;
+$("brand").textContent = CONFIG.NAME;
+$("name").innerHTML = `${esc(CONFIG.NAME).replace(/^(\S+)/, "<em>$1</em>")}`;
+$("tagline").textContent = CONFIG.TAGLINE;
+$("about-text").innerHTML = CONFIG.ABOUT.map((p) => `<p>${esc(p)}</p>`).join("");
+$("skills").innerHTML = CONFIG.SKILLS.map((s) => `<span class="chip">${esc(s)}</span>`).join("");
+$("foot").textContent = `© ${new Date().getFullYear()} ${CONFIG.NAME}`;
+const ghUrl = placeholderUser ? "https://github.com" : `https://github.com/${CONFIG.GITHUB_USER}`;
+$("gh-btn").href = ghUrl;
+const links = [{ label: "GitHub", url: ghUrl }, ...CONFIG.LINKS];
+$("link-list").innerHTML = links.filter((l) => safeUrl(l.url)).map((l) => `<a href="${esc(l.url)}" target="_blank" rel="noopener">${esc(l.label)} ↗</a>`).join("");
+
+/* ---------- theme toggle (remembered if storage works) ---------- */
+(function () {
+  const root = document.documentElement;
+  try { const t = localStorage.getItem("theme"); if (t) root.setAttribute("data-theme", t); } catch {}
+  $("theme").addEventListener("click", () => {
+    const dark = getComputedStyle(root).getPropertyValue("--bg").trim() === "#14112a";
+    const next = dark ? "light" : "dark";
+    root.setAttribute("data-theme", next);
+    try { localStorage.setItem("theme", next); } catch {}
+    bgColors();
+  });
+})();
+
+/* ---------- GitHub repos ---------- */
+const LANG_COLORS = { JavaScript:"#f1e05a", TypeScript:"#3178c6", Python:"#3572A5", HTML:"#e34c26", CSS:"#a78bfa", GDScript:"#355570", Java:"#b07219", "C++":"#f34b7d", C:"#888", Rust:"#dea584", Go:"#00ADD8", Shell:"#89e051", Kotlin:"#A97BFF", Swift:"#F05138", "Jupyter Notebook":"#DA5B0B", Lua:"#000080", PLpgSQL:"#336790" };
+const ago = (iso) => {
+  const d = (Date.now() - new Date(iso)) / 864e5;
+  if (d < 1) return "today"; if (d < 2) return "yesterday"; if (d < 30) return `${Math.floor(d)} days ago`;
+  if (d < 365) return `${Math.floor(d / 30)} mo ago`; return `${Math.floor(d / 365)} yr ago`;
+};
+let repos = [];
+function renderRepos(filter) {
+  const list = repos.filter((r) => !filter || r.language === filter);
+  $("repos").innerHTML = list.map((r) => `
+    <a class="glass repo" href="${esc(r.html_url)}" target="_blank" rel="noopener">
+      <h3>${esc(r.name)}</h3>
+      <p>${esc(r.description || "No description yet.")}</p>
+      ${r.topics?.length ? `<div class="topics">${r.topics.slice(0, 4).map((t) => `<span>${esc(t)}</span>`).join("")}</div>` : ""}
+      <div class="meta">
+        ${r.language ? `<span><i class="dot" style="background:${LANG_COLORS[r.language] || "#b9a3e8"}"></i>${esc(r.language)}</span>` : ""}
+        ${r.stargazers_count ? `<span>★ ${r.stargazers_count}</span>` : ""}
+        <span>Updated ${ago(r.pushed_at || r.updated_at)}</span>
+        ${safeUrl(r.homepage) ? `<span>↗ live</span>` : ""}
+      </div>
+    </a>`).join("");
+}
+function renderFilters() {
+  const counts = {};
+  repos.forEach((r) => r.language && (counts[r.language] = (counts[r.language] || 0) + 1));
+  const langs = Object.keys(counts).sort((a, b) => counts[b] - counts[a]);
+  if (langs.length < 2) return;
+  const f = $("filters"); f.hidden = false;
+  f.innerHTML = ["All", ...langs].map((l, i) => `<button type="button" data-l="${i ? esc(l) : ""}" aria-pressed="${i === 0}">${esc(l)}${i ? ` · ${counts[l]}` : ""}</button>`).join("");
+  f.onclick = (e) => {
+    const b = e.target.closest("button"); if (!b) return;
+    f.querySelectorAll("button").forEach((x) => x.setAttribute("aria-pressed", x === b));
+    renderRepos(b.dataset.l);
+  };
+}
+async function loadRepos() {
+  if (placeholderUser) {
+    $("repos").innerHTML = "";
+    $("repos-note").textContent = "Set GITHUB_USER at the top of the script and your public repositories will appear here automatically.";
+    return;
+  }
+  const key = `repos:${CONFIG.GITHUB_USER}`;
+  let data = null;
+  try { const c = JSON.parse(sessionStorage.getItem(key) || "null"); if (c && Date.now() - c.t < 6e5) data = c.d; } catch {}
+  try {
+    if (!data) {
+      const r = await fetch(`https://api.github.com/users/${encodeURIComponent(CONFIG.GITHUB_USER)}/repos?per_page=100&sort=pushed`, { headers: { Accept: "application/vnd.github+json" } });
+      if (!r.ok) throw new Error(r.status);
+      data = await r.json();
+      try { sessionStorage.setItem(key, JSON.stringify({ t: Date.now(), d: data })); } catch {}
+    }
+    repos = data.filter((r) => !r.fork && !r.archived && !CONFIG.EXCLUDE.includes(r.name))
+      .sort((a, b) => new Date(b.pushed_at) - new Date(a.pushed_at));
+    if (!repos.length) { $("repos").innerHTML = ""; $("repos-note").textContent = "No public projects yet — check back soon."; return; }
+    renderFilters(); renderRepos("");
+  } catch {
+    $("repos").innerHTML = "";
+    $("repos-note").innerHTML = `Couldn't load projects right now. <a href="${esc(ghUrl)}?tab=repositories" target="_blank" rel="noopener">See them on GitHub ↗</a>`;
+  }
+}
+loadRepos();
+
+/* ---------- featured app (latest GitHub release) ---------- */
+(async function () {
+  const A = CONFIG.APP; if (!A || (!A.RELEASES_REPO && !A.WEB_URL)) return;
+  $("app").hidden = false; $("app-name").textContent = A.NAME; $("app-desc").textContent = A.DESC;
+  const out = $("app-dls"); const add = (label, url) => url && out.insertAdjacentHTML("beforeend", `<a href="${esc(url)}" rel="noopener">${esc(label)}</a>`);
+  if (A.RELEASES_REPO) {
+    try {
+      const r = await fetch(`https://api.github.com/repos/${A.RELEASES_REPO}/releases/latest`);
+      if (!r.ok) throw 0;
+      const rel = await r.json();
+      const kinds = [[/\.AppImage$/i, "🐧 Linux"], [/\.deb$/i, "📦 .deb"], [/\.apk$/i, "🤖 Android"], [/\.(exe|msi)$/i, "🪟 Windows"], [/\.(dmg|pkg)$/i, "🍎 macOS"]];
+      kinds.forEach(([re, label]) => { const a = (rel.assets || []).find((x) => re.test(x.name)); if (a) add(`${label} · ${rel.tag_name}`, a.browser_download_url); });
+      if (!out.children.length) add("Releases ↗", `https://github.com/${A.RELEASES_REPO}/releases`);
+    } catch { add("Releases ↗", `https://github.com/${A.RELEASES_REPO}/releases`); }
+  }
+  add("🌐 Web app", safeUrl(A.WEB_URL));
+})();
+
+/* ---------- background: a drifting fractal garden ---------------------------
+   Julia sets in soft pastel palettes, each in its own colour scheme, drifting
+   slowly around the page. Computed on tiny tiles and blurred, so it reads as
+   watercolour. Pauses when the tab is hidden; static with reduced motion. */
+let bgColors = () => {};
+(function () {
+  const canvas = $("bg"), ctx = canvas.getContext("2d");
+  const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const hex = (h) => { const n = parseInt(h.slice(1), 16); return [n >> 16 & 255, n >> 8 & 255, n & 255]; };
+  const mix = (a, b, t) => a + (b - a) * t;
+  const PAL = {
+    peach:    ["#ffd3bf", "#ffe3b8", "#ffc9d6", "#ffd9a8"].map(hex),
+    sage:     ["#cfeccd", "#bfe8d8", "#e2f1b9", "#b4e3c4"].map(hex),
+    peri:     ["#c9d2ff", "#dac8ff", "#bfe0ff", "#d2c4f5"].map(hex),
+    blush:    ["#ffc9de", "#f6c1f0", "#ffd6e6", "#e9bfff"].map(hex),
+    aqua:     ["#b7ecf2", "#c4f2e0", "#bcd8ff", "#a8e6dc"].map(hex),
+    lemon:    ["#fff2a6", "#ffe0b0", "#f9f5b5", "#ffd1b8"].map(hex),
+  };
+  const blobs = [
+    { x: .16, y: .20, r: .34, c: [-.75, .11],       amp: [.03, .03],   sp: .9, ph: 0,   pal: "peach", zoom: 1.45, dx: .05, dy: .04 },
+    { x: .84, y: .16, r: .30, c: [-.5251, .5213],   amp: [.02, .02],   sp: 1.0, ph: 1.2, pal: "aqua",  zoom: 1.5,  dx: .04, dy: .05 },
+    { x: .50, y: .50, r: .36, c: [-.8, .156],       amp: [.04, .05],   sp: .7, ph: 2.4, pal: "peri",  zoom: 1.5,  dx: .06, dy: .03 },
+    { x: .12, y: .78, r: .30, c: [.285, .01],       amp: [.012, .012], sp: 1.1, ph: 3.6, pal: "sage",  zoom: 1.45, dx: .04, dy: .05 },
+    { x: .88, y: .74, r: .33, c: [-.162, 1.04],     amp: [.02, .02],   sp: .8, ph: 4.8, pal: "blush", zoom: 1.55, dx: .05, dy: .04 },
+    { x: .55, y: .95, r: .24, c: [-.70176, -.3842], amp: [.02, .025],  sp: 1.2, ph: 5.9, pal: "lemon", zoom: 1.55, dx: .03, dy: .03 },
+  ];
+  const S = 112, MAXIT = 52;
+  blobs.forEach((b) => { b.tile = document.createElement("canvas"); b.tile.width = b.tile.height = S; b.tctx = b.tile.getContext("2d"); b.img = b.tctx.createImageData(S, S); });
+  let base = [255, 249, 246], dark = false;
+  bgColors = () => {
+    const bg = getComputedStyle(document.documentElement).getPropertyValue("--bg").trim();
+    base = /^#[0-9a-f]{6}$/i.test(bg) ? hex(bg) : base;
+    dark = (base[0] * 299 + base[1] * 587 + base[2] * 114) / 1000 < 110;
+    if (reduce) draw(0);
+  };
+  const pal = (st, u) => { const n = st.length, f = (((u % 1) + 1) % 1) * n, i = Math.floor(f), k = f - i, a = st[i % n], b = st[(i + 1) % n]; return [mix(a[0], b[0], k), mix(a[1], b[1], k), mix(a[2], b[2], k)]; };
+  function tile(b, t) {
+    const st = PAL[b.pal], a = t * .1 * b.sp + b.ph;
+    const cr = b.c[0] + b.amp[0] * Math.cos(a), ci = b.c[1] + b.amp[1] * Math.sin(a * 1.3), d = b.img.data;
+    let p = 0;
+    for (let py = 0; py < S; py++) { const ny = py / (S - 1) * 2 - 1;
+      for (let px = 0; px < S; px++) { const nx = px / (S - 1) * 2 - 1, dist = Math.hypot(nx, ny), e = Math.max(0, Math.min(1, (.98 - dist) / .5));
+        if (e <= 0) { p += 4; continue; }
+        let x = nx * b.zoom, y = ny * b.zoom, n = 0;
+        while (n < MAXIT) { const xx = x * x, yy = y * y; if (xx + yy > 16) break; y = 2 * x * y + ci; x = xx - yy + cr; n++; }
+        let r, g, bl;
+        if (n >= MAXIT) { r = mix(st[0][0], 255, .4); g = mix(st[0][1], 255, .4); bl = mix(st[0][2], 255, .4); }
+        else { const m = Math.hypot(x, y), sm = n + 1 - Math.log(Math.log(Math.max(m, 1.0001))) / Math.LN2; [r, g, bl] = pal(st, sm * .055 + t * .008 * b.sp); }
+        d[p++] = r; d[p++] = g; d[p++] = bl; d[p++] = 255 * e * e; } }
+    b.tctx.putImageData(b.img, 0, 0);
+  }
+  function size() { const w = Math.round(innerWidth / 1.5), h = Math.round(innerHeight / 1.5); if (canvas.width !== w || canvas.height !== h) { canvas.width = w; canvas.height = h; } }
+  function draw(t) {
+    size();
+    ctx.fillStyle = `rgb(${base[0]},${base[1]},${base[2]})`; ctx.fillRect(0, 0, canvas.width, canvas.height);
+    const short = Math.min(canvas.width, canvas.height);
+    ctx.save(); ctx.globalAlpha = dark ? .38 : .8; ctx.globalCompositeOperation = dark ? "screen" : "source-over"; ctx.imageSmoothingQuality = "high";
+    try { ctx.filter = "blur(4px)"; } catch {}
+    blobs.forEach((b) => {
+      tile(b, t);
+      const side = b.r * 2 * short * 1.3, ox = Math.sin(t * .05 + b.ph) * b.dx, oy = Math.cos(t * .04 + b.ph * 1.7) * b.dy;
+      ctx.drawImage(b.tile, (b.x + ox) * canvas.width - side / 2, (b.y + oy) * canvas.height - side / 2, side, side);
+    });
+    ctx.restore();
+  }
+  let last = 0;
+  function frame(now) { if (now - last > 90) { last = now; draw(now / 1000); } requestAnimationFrame(frame); }
+  bgColors();
+  if (reduce) { draw(0); addEventListener("resize", () => draw(0)); } else requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>
