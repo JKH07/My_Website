@@ -1,0 +1,667 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Gemimi — Cozy Planner</title>
+<meta name="description" content="Gemimi, a cozy weekly planner with a little pet. Previews, downloads and a pet maker you can try in the browser.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='18' fill='%23a68be0'/><circle cx='32' cy='32' r='12' fill='%23fff' opacity='.85'/></svg>">
+<style>
+:root{
+  --bg:#fff9f6; --surface:#ffffff; --text:#3f3566; --muted:#857aa8; --line:#eadff7;
+  --accent:#8f72d8; --accent-ink:#fff; --soft:#f1eafb;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#14112a; --surface:#1d1838; --text:#ece6fa; --muted:#a095c8; --line:#37305e;
+    --accent:#b9a3e8; --accent-ink:#1b1630; --soft:#2a2347;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#14112a; --surface:#1d1838; --text:#ece6fa; --muted:#a095c8; --line:#37305e;
+  --accent:#b9a3e8; --accent-ink:#1b1630; --soft:#2a2347;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:84px}
+body{margin:0;background:var(--bg);color:var(--text);font:18px/1.65 "Times New Roman",Times,"Liberation Serif",serif;overflow-x:hidden}
+#bg{position:fixed;inset:0;width:100vw;height:100vh;z-index:-1;display:block}
+.wrap{max-width:960px;margin:0 auto;padding:0 20px}
+a{color:var(--accent)}
+a:focus-visible,button:focus-visible,input:focus-visible,summary:focus-visible,canvas:focus-visible{outline:3px solid var(--accent);outline-offset:3px;border-radius:8px}
+::selection{background:var(--accent);color:var(--accent-ink)}
+
+nav.bar{position:sticky;top:12px;z-index:10;display:flex;align-items:center;gap:6px;margin-top:12px;padding:8px 12px;border-radius:16px;
+  background:color-mix(in srgb,var(--surface) 72%,transparent);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+  border:1px solid color-mix(in srgb,var(--line) 80%,transparent)}
+nav .brand{font-weight:800;letter-spacing:.2px;margin-right:auto;color:var(--text);text-decoration:none;font-size:20px}
+nav a.l{color:var(--muted);text-decoration:none;padding:6px 12px;border-radius:10px;font-size:16px;transition:background .2s,color .2s}
+nav a.l:hover,nav a.l.active{background:var(--soft);color:var(--text)}
+.theme{display:grid;place-items:center;padding:0;border:1px solid var(--line);background:var(--surface);color:var(--text);width:36px;height:36px;border-radius:10px;cursor:pointer;transition:transform .3s,border-color .2s}
+.theme:hover{transform:rotate(180deg);border-color:var(--accent)}
+@media(max-width:620px){nav a.l.hide-sm{display:none}}
+
+.glass{position:relative;overflow:hidden;background:color-mix(in srgb,var(--surface) 72%,transparent);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+  border:1px solid color-mix(in srgb,var(--line) 80%,transparent);border-radius:20px;
+  transition:transform .25s ease,box-shadow .25s ease,border-color .25s ease}
+.glass::before{content:"";position:absolute;inset:0;pointer-events:none;opacity:0;transition:opacity .25s;
+  background:radial-gradient(280px circle at var(--mx,50%) var(--my,50%),color-mix(in srgb,var(--accent) 20%,transparent),transparent 70%)}
+.glass:hover{transform:translateY(-4px);border-color:var(--accent);box-shadow:0 14px 34px color-mix(in srgb,var(--accent) 22%,transparent)}
+.glass:hover::before{opacity:1}
+/* the drawing area must never move under the pointer */
+.glass.static:hover{transform:none;box-shadow:none}
+.glass.static::before{display:none}
+
+.hero{padding:70px 0 20px}
+.hero .hi{color:color-mix(in srgb,var(--text) 75%,var(--muted));font-size:19px;margin:0 0 6px}
+.hero h1{font-size:clamp(40px,7vw,68px);line-height:1.05;margin:0 0 14px;letter-spacing:-1px}
+.hero h1 em{font-style:normal;color:var(--accent)}
+.hero p.tag{font-size:21px;color:color-mix(in srgb,var(--text) 75%,var(--muted));max-width:640px;margin:0 0 26px}
+.btns{display:flex;gap:14px;flex-wrap:wrap;align-items:center}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:12px 22px;border-radius:14px;font:inherit;font-weight:700;text-decoration:none;border:0;cursor:pointer;background:var(--accent);color:var(--accent-ink);box-shadow:0 8px 22px color-mix(in srgb,var(--accent) 30%,transparent);transition:transform .15s,box-shadow .15s}
+.btn:hover{transform:translateY(-2px);box-shadow:0 12px 28px color-mix(in srgb,var(--accent) 40%,transparent)}
+.btn.ghost{background:color-mix(in srgb,var(--surface) 72%,transparent);color:var(--text);border:1px solid var(--line);box-shadow:none}
+.dls{display:flex;gap:8px;flex-wrap:wrap;margin-top:18px}
+.dls a{padding:8px 14px;border-radius:12px;border:1px solid var(--line);background:var(--surface);color:var(--text);text-decoration:none;font-weight:600;font-size:15px;transition:transform .15s,border-color .15s,background .15s}
+.dls a:hover{border-color:var(--accent);transform:translateY(-2px);background:var(--soft)}
+
+section{margin-top:64px}
+h2{font-size:28px;margin:0 0 6px;letter-spacing:-.3px}
+h2::after{content:"";display:block;width:44px;height:3px;border-radius:3px;background:var(--accent);margin-top:6px;transition:width .3s}
+section:hover h2::after{width:84px}
+.lede{color:var(--muted);margin:10px 0 20px;max-width:62ch}
+
+.rv{opacity:0;transform:translateY(20px);transition:opacity .6s ease,transform .6s ease}
+.rv.in{opacity:1;transform:none}
+
+/* features */
+.feats{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:14px}
+.feat{padding:18px 20px;display:flex;gap:14px;align-items:flex-start}
+.feat .e{font-size:26px;line-height:1}
+.feat h3{margin:0 0 2px;font-size:19px}
+.feat p{margin:0;color:var(--muted);font-size:16px;line-height:1.45}
+
+/* gallery */
+.shots{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:16px}
+.shot{padding:0;display:flex;flex-direction:column;text-align:left;font:inherit;color:inherit;cursor:zoom-in}
+.shot .frame{aspect-ratio:16/10;background:var(--soft);display:grid;place-items:center;border-bottom:1px solid var(--line)}
+.shot img{width:100%;height:100%;object-fit:contain;display:block}
+.shot .cap{padding:12px 16px 14px}
+.shot .cap b{display:block;font-size:18px}
+.shot .cap span{color:var(--muted);font-size:15px;line-height:1.4;display:block}
+.shot.empty{cursor:default}
+.ph{width:78%;height:78%;border-radius:12px;border:2px dashed var(--line);display:flex;flex-direction:column;gap:8px;padding:12px;justify-content:center}
+.ph i{display:block;height:9px;border-radius:5px;background:color-mix(in srgb,var(--accent) 22%,transparent)}
+.ph i:nth-child(1){width:55%;background:color-mix(in srgb,var(--accent) 45%,transparent)}
+.ph i:nth-child(2){width:90%}.ph i:nth-child(3){width:75%}.ph i:nth-child(4){width:82%}
+.ph small{color:var(--muted);font-size:13px;margin-top:4px;font-style:italic}
+
+dialog#lb{border:0;padding:0;background:transparent;max-width:min(94vw,1100px);width:100%;color:var(--text)}
+dialog#lb::backdrop{background:rgba(10,8,24,.72);backdrop-filter:blur(4px)}
+.lb-in{background:var(--surface);border:1px solid var(--line);border-radius:18px;overflow:hidden;display:flex;flex-direction:column}
+.lb-in img{max-width:100%;max-height:74vh;object-fit:contain;display:block;margin:0 auto;background:var(--soft);width:100%}
+.lb-bar{display:flex;align-items:center;gap:10px;padding:12px 16px}
+.lb-bar p{margin:0;flex:1;font-size:16px}
+.lb-bar button{font:inherit;font-size:18px;width:38px;height:38px;border-radius:10px;border:1px solid var(--line);background:var(--soft);color:var(--text);cursor:pointer}
+.lb-bar button:hover{border-color:var(--accent)}
+
+/* ---------- pet maker ---------- */
+.maker{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:22px;padding:20px}
+@media(max-width:860px){.maker{grid-template-columns:minmax(0,1fr)}}
+.tools{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
+.tb{font:inherit;font-size:15px;padding:7px 12px;border-radius:12px;border:1px solid var(--line);background:color-mix(in srgb,var(--surface) 80%,transparent);color:var(--text);cursor:pointer;display:inline-flex;gap:6px;align-items:center;transition:border-color .15s,background .15s,transform .15s;min-height:40px}
+.tb:hover:not(:disabled){border-color:var(--accent);transform:translateY(-1px)}
+.tb[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.tb:disabled{opacity:.4;cursor:not-allowed}
+.tb kbd{font:inherit;font-size:11px;opacity:.6;border:1px solid currentColor;border-radius:4px;padding:0 4px;line-height:1.3}
+.sep{width:1px;background:var(--line);margin:2px 4px}
+#art{width:100%;aspect-ratio:22/20;display:block;border-radius:14px;border:1px solid var(--line);background:var(--soft);touch-action:none;cursor:crosshair;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+.hint{color:var(--muted);font-size:14px;margin:10px 2px 0}
+.side h3{font-size:14px;text-transform:uppercase;letter-spacing:.8px;color:var(--muted);margin:0 0 8px;font-weight:700}
+.side h3:not(:first-child){margin-top:20px}
+.presets{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.pre{font:inherit;font-size:13px;color:var(--text);display:flex;flex-direction:column;align-items:center;gap:4px;padding:8px 4px;border-radius:12px;border:1px solid var(--line);background:color-mix(in srgb,var(--surface) 80%,transparent);cursor:pointer;transition:border-color .15s,transform .15s}
+.pre:hover{border-color:var(--accent);transform:translateY(-2px)}
+.pre canvas{width:44px;height:40px;image-rendering:pixelated}
+.pal{display:flex;flex-direction:column;gap:6px}
+.pr{display:flex;align-items:center;gap:8px;padding:5px 8px;border-radius:12px;border:1px solid var(--line);background:color-mix(in srgb,var(--surface) 80%,transparent)}
+.pr[data-on="true"]{border-color:var(--accent);background:var(--soft);box-shadow:inset 0 0 0 1px var(--accent)}
+.pr .sel{flex:1;display:flex;align-items:center;gap:10px;background:none;border:0;font:inherit;font-size:16px;color:var(--text);cursor:pointer;text-align:left;padding:4px 0;min-height:36px}
+.sw{width:22px;height:22px;border-radius:6px;border:1px solid rgba(0,0,0,.18);flex:none}
+.pr input[type=color]{width:38px;height:34px;padding:0;border:1px solid var(--line);border-radius:8px;background:none;cursor:pointer}
+.stage-wrap{border-radius:14px;overflow:hidden;border:1px solid var(--line)}
+#stage{display:block;width:100%;aspect-ratio:4/3;image-rendering:pixelated;cursor:pointer;touch-action:manipulation}
+.pet-row{display:flex;gap:8px;align-items:center;margin-top:10px;flex-wrap:wrap}
+.pet-row input[type=text]{flex:1;min-width:120px;font:inherit;font-size:16px;padding:8px 12px;border-radius:12px;border:1px solid var(--line);background:var(--surface);color:var(--text)}
+.bond{display:flex;align-items:center;gap:10px;margin-top:10px;font-size:15px;color:var(--muted)}
+.bond .bar{flex:1;height:10px;border-radius:6px;background:var(--soft);border:1px solid var(--line);overflow:hidden}
+.bond .bar i{display:block;height:100%;width:0;background:var(--accent);transition:width .3s}
+#mood{margin:8px 0 0;min-height:1.6em;font-style:italic;color:var(--muted);font-size:16px}
+.acts{display:flex;gap:8px;flex-wrap:wrap}
+#status{color:var(--muted);font-size:14px;margin:10px 0 0;min-height:1.4em}
+
+footer{margin:70px 0 36px;text-align:center;color:var(--muted);font-size:15px}
+footer a{color:var(--muted);text-decoration:none;display:inline-block;margin:6px 8px 0;transition:color .2s,transform .2s}
+footer a:hover{color:var(--accent);transform:translateY(-2px)}
+[hidden]{display:none!important}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+
+@media(prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  .rv{opacity:1;transform:none;transition:none}
+  .glass,.btn,.theme,.tb,.pre,.dls a{transition:none}
+  .glass:hover,.btn:hover,.theme:hover,.tb:hover,.pre:hover,.dls a:hover{transform:none}
+}
+</style>
+</head>
+<body>
+<canvas id="bg" aria-hidden="true"></canvas>
+
+<div class="wrap">
+  <nav class="bar">
+    <a class="brand" href="#top" id="brand">Gemimi</a>
+    <a class="l hide-sm" href="index.html">← Portfolio</a>
+    <a class="l" href="#preview">Preview</a>
+    <a class="l" href="#maker">Pet maker</a>
+    <a class="l hide-sm" href="#get">Get it</a>
+    <button class="theme" id="theme" type="button" aria-label="Toggle light/dark"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 1 0 18z" fill="currentColor"/></svg></button>
+  </nav>
+
+  <header class="hero" id="top">
+    <p class="hi">A personal planner, made by <a href="index.html" style="color:inherit">Jana</a></p>
+    <h1 id="name"></h1>
+    <p class="tag" id="tagline"></p>
+    <div class="btns">
+      <a class="btn" href="#maker">🎨 Try the pet maker</a>
+      <a class="btn ghost" href="#preview">See previews</a>
+    </div>
+    <div class="dls" id="dls-hero"></div>
+  </header>
+
+  <section id="features" class="rv">
+    <h2>What's inside</h2>
+    <div class="feats" id="feats"></div>
+  </section>
+
+  <section id="preview" class="rv">
+    <h2>Preview</h2>
+    <p class="lede">A look at the app. Tap a picture to see it full size.</p>
+    <div class="shots" id="shots"></div>
+  </section>
+
+  <section id="maker" class="rv">
+    <h2>Make your pet</h2>
+    <p class="lede">A tiny version of the pet editor from the app. Pick a starter or draw your own, then say hello to it.</p>
+    <div class="glass static maker">
+      <div class="draw">
+        <div class="tools" role="toolbar" aria-label="Drawing tools">
+          <button class="tb" type="button" data-tool="pen" aria-pressed="true">✏️ Pen <kbd>B</kbd></button>
+          <button class="tb" type="button" data-tool="erase" aria-pressed="false">🧽 Eraser <kbd>E</kbd></button>
+          <button class="tb" type="button" data-tool="fill" aria-pressed="false">🪣 Fill <kbd>F</kbd></button>
+          <button class="tb" type="button" data-tool="pick" aria-pressed="false">💧 Pick <kbd>I</kbd></button>
+          <span class="sep" aria-hidden="true"></span>
+          <button class="tb" type="button" id="mirror" aria-pressed="false" title="Draw both sides at once">🪞 Mirror <kbd>M</kbd></button>
+          <span class="sep" aria-hidden="true"></span>
+          <button class="tb" type="button" id="undo" disabled>⟲ Undo</button>
+          <button class="tb" type="button" id="redo" disabled>⟳ Redo</button>
+          <button class="tb" type="button" id="clear">Clear</button>
+        </div>
+        <canvas id="art" tabindex="0" role="img" aria-label="Pet drawing canvas. Draw with a mouse, finger or pen."></canvas>
+        <p class="hint">Drag to draw. Right-click (or the Eraser) to erase. Strokes undo in one step, so <b>Ctrl/⌘ + Z</b> takes back a whole line.</p>
+      </div>
+
+      <div class="side">
+        <h3>Starters</h3>
+        <div class="presets" id="presets"></div>
+
+        <h3>Colours</h3>
+        <div class="pal" id="pal"></div>
+
+        <h3>Meet your pet</h3>
+        <div class="stage-wrap"><canvas id="stage" width="320" height="240" aria-label="Your pet. Click it to give it a pat."></canvas></div>
+        <div class="pet-row">
+          <input type="text" id="petname" maxlength="16" value="Mochi" aria-label="Pet name" autocomplete="off">
+          <button class="tb" type="button" id="pat">♥ Pat</button>
+        </div>
+        <div class="bond"><span id="bondlabel">♥ 0 / 10</span><span class="bar"><i id="bondbar"></i></span></div>
+        <p id="mood" aria-live="polite"></p>
+
+        <h3>Keep it</h3>
+        <div class="acts">
+          <button class="tb" type="button" id="png">⬇ PNG</button>
+          <button class="tb" type="button" id="copy">📋 Copy data</button>
+        </div>
+        <p id="status" role="status" aria-live="polite"></p>
+      </div>
+    </div>
+  </section>
+
+  <section id="get" class="rv">
+    <h2>Get Gemimi</h2>
+    <div class="glass" style="padding:22px 26px">
+      <p style="margin:0 0 4px" id="get-text">Downloads come from the latest release.</p>
+      <div class="dls" id="dls-get"></div>
+    </div>
+  </section>
+
+  <footer class="rv"><span id="foot"></span><br><a href="index.html">← Back to portfolio</a><a href="#top">Back to top ↑</a></footer>
+</div>
+
+<dialog id="lb" aria-label="Screenshot viewer">
+  <div class="lb-in">
+    <img id="lb-img" alt="">
+    <div class="lb-bar">
+      <button type="button" id="lb-prev" aria-label="Previous">‹</button>
+      <p id="lb-cap"></p>
+      <button type="button" id="lb-next" aria-label="Next">›</button>
+      <button type="button" id="lb-x" aria-label="Close">✕</button>
+    </div>
+  </div>
+</dialog>
+
+<script>
+/* ============ EDIT THIS BLOCK ============================================ */
+const CONFIG = {
+  NAME: "Gemimi",
+  TAGLINE: "A cozy weekly planner with day notes, projects, a bulletin board and a little pet. Soft themes, synced across devices.",
+  RELEASES_REPO: "JKH07/gemimi-releases",
+  WEB_URL: "",   // optional web version
+  FEATURES: [
+    { e: "📅", t: "Week, month & year", d: "See the week at a glance, then zoom out." },
+    { e: "📝", t: "Day notes & projects", d: "Jot things down and keep bigger goals together." },
+    { e: "📌", t: "Bulletin board", d: "Pin quotes, pictures and reminders." },
+    { e: "🐰", t: "A pet to look after", d: "Feed it, dress it up, or draw your own." },
+    { e: "🎮", t: "Mini-games", d: "Memory match, whack-a-mole and a coin collector." },
+    { e: "☁️", t: "Synced everywhere", d: "Pick up on desktop or on your phone." },
+  ],
+  /* PICTURE PREVIEWS
+     1. Make a folder called  gemimi  next to this file and drop your screenshots in it.
+     2. Fill in `src` below (e.g. "gemimi/week.png"). Add or remove blocks freely.
+     3. Leave `src` as "" to show a placeholder card until you have the picture.        */
+  SHOTS: [
+    { src: "", title: "Week view",       caption: "Your whole week, one task line at a time." },
+    { src: "", title: "Day notes",       caption: "A page for each day." },
+    { src: "", title: "Bulletin board",  caption: "Pin things you want to keep." },
+    { src: "", title: "Pet & mini-games",caption: "Take a break and look after your pet." },
+  ],
+};
+/* ========================================================================= */
+
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const safeUrl = (u) => (/^(https?:|mailto:)/i.test(u || "") ? u : "");
+const safeSrc = (u) => (/^(https?:\/\/|\.?\.?\/?[\w\-./%~ ]+$)/i.test(u || "") && !/^\s*javascript:/i.test(u) ? u : "");
+const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+/* ---------- basic content ---------- */
+document.title = `${CONFIG.NAME} — Cozy Planner`;
+$("brand").textContent = CONFIG.NAME;
+$("name").innerHTML = `<em>${esc(CONFIG.NAME)}</em>`;
+$("tagline").textContent = CONFIG.TAGLINE;
+$("foot").textContent = `© ${new Date().getFullYear()} Jana`;
+$("feats").innerHTML = CONFIG.FEATURES.map((f) => `<div class="glass feat"><span class="e" aria-hidden="true">${esc(f.e)}</span><div><h3>${esc(f.t)}</h3><p>${esc(f.d)}</p></div></div>`).join("");
+
+/* ---------- theme toggle (shares the portfolio's saved choice) ---------- */
+(function () {
+  const root = document.documentElement;
+  try { const t = localStorage.getItem("theme"); if (t) root.setAttribute("data-theme", t); } catch {}
+  $("theme").addEventListener("click", () => {
+    const dark = getComputedStyle(root).getPropertyValue("--bg").trim() === "#14112a";
+    const next = dark ? "light" : "dark";
+    root.setAttribute("data-theme", next);
+    try { localStorage.setItem("theme", next); } catch {}
+    bgColors(); themeChanged();
+  });
+})();
+
+document.addEventListener("pointermove", (e) => {
+  const g = e.target.closest && e.target.closest(".glass");
+  if (!g) return;
+  const r = g.getBoundingClientRect();
+  g.style.setProperty("--mx", e.clientX - r.left + "px");
+  g.style.setProperty("--my", e.clientY - r.top + "px");
+});
+
+(function () {
+  const els = document.querySelectorAll(".rv");
+  if (!("IntersectionObserver" in window) || reduce) { els.forEach((e) => e.classList.add("in")); return; }
+  const io = new IntersectionObserver((en) => en.forEach((x) => { if (x.isIntersecting) { x.target.classList.add("in"); io.unobserve(x.target); } }), { threshold: 0.05 });
+  els.forEach((e) => io.observe(e));
+})();
+
+/* ---------- picture previews + lightbox ---------- */
+const shots = CONFIG.SHOTS.filter((s) => s && s.title);
+$("shots").innerHTML = shots.map((s, i) => {
+  const src = safeSrc(s.src);
+  const cap = `<div class="cap"><b>${esc(s.title)}</b><span>${esc(s.caption || "")}</span></div>`;
+  return src
+    ? `<button type="button" class="glass shot" data-i="${i}" aria-label="Open ${esc(s.title)}"><div class="frame"><img src="${esc(src)}" alt="${esc(s.title)}" loading="lazy"></div>${cap}</button>`
+    : `<div class="glass shot empty"><div class="frame"><div class="ph" aria-hidden="true"><i></i><i></i><i></i><i></i><small>picture coming soon</small></div></div>${cap}</div>`;
+}).join("");
+(function () {
+  const lb = $("lb"); let cur = 0;
+  const real = shots.map((s, i) => ({ ...s, i })).filter((s) => safeSrc(s.src));
+  function show(k) {
+    if (!real.length) return;
+    cur = (k + real.length) % real.length;
+    const s = real[cur];
+    $("lb-img").src = safeSrc(s.src); $("lb-img").alt = s.title;
+    $("lb-cap").innerHTML = `<b>${esc(s.title)}</b> — ${esc(s.caption || "")}`;
+    $("lb-prev").hidden = $("lb-next").hidden = real.length < 2;
+  }
+  $("shots").addEventListener("click", (e) => {
+    const b = e.target.closest("button.shot"); if (!b) return;
+    show(real.findIndex((s) => s.i === +b.dataset.i));
+    if (!lb.open) lb.showModal();
+  });
+  $("lb-prev").onclick = () => show(cur - 1);
+  $("lb-next").onclick = () => show(cur + 1);
+  $("lb-x").onclick = () => lb.close();
+  lb.addEventListener("click", (e) => { if (e.target === lb) lb.close(); });
+  lb.addEventListener("keydown", (e) => { if (e.key === "ArrowLeft") show(cur - 1); if (e.key === "ArrowRight") show(cur + 1); });
+})();
+
+/* ---------- downloads (latest GitHub release) ---------- */
+(async function () {
+  const repo = CONFIG.RELEASES_REPO, web = safeUrl(CONFIG.WEB_URL);
+  const outs = [$("dls-hero"), $("dls-get")];
+  const add = (label, url) => url && outs.forEach((o) => o.insertAdjacentHTML("beforeend", `<a href="${esc(url)}" rel="noopener">${esc(label)}</a>`));
+  if (repo) {
+    try {
+      const r = await fetch(`https://api.github.com/repos/${repo}/releases/latest`);
+      if (!r.ok) throw 0;
+      const rel = await r.json();
+      const kinds = [[/\.AppImage$/i, "🐧 Linux"], [/\.deb$/i, "📦 .deb"], [/\.apk$/i, "🤖 Android"], [/\.(exe|msi)$/i, "🪟 Windows"], [/\.(dmg|pkg)$/i, "🍎 macOS"]];
+      kinds.forEach(([re, label]) => { const a = (rel.assets || []).find((x) => re.test(x.name)); if (a) add(`${label} · ${rel.tag_name}`, a.browser_download_url); });
+      if (!outs[0].children.length) add("Releases ↗", `https://github.com/${repo}/releases`);
+    } catch { add("Releases ↗", `https://github.com/${repo}/releases`); }
+  }
+  add("🌐 Web app", web);
+  if (!outs[0].children.length) { $("dls-hero").hidden = true; $("get-text").textContent = "Downloads are coming soon."; }
+})();
+
+/* =====================================================================
+   PET MAKER
+   Reference design for fixing the in-app editor:
+   - one <canvas> instead of ~440 divs
+   - Pointer Events (mouse + touch + pen) with pointer capture
+   - a stroke is ONE undo step; fast drags are joined with a line
+   - square cells that scale to whatever width the page gives them
+   - live preview, fill / pick / mirror, presets are undoable
+   ===================================================================== */
+const COLS = 22, ROWS = 20, MIRROR_W = 20; // sprites are 20 wide inside the 22-wide grid, so the mirror axis sits at 9.5
+const PRESET_DATA = {"bunny":["0000111000000111000000","0001232100001232100000","0001232100001232100000","0001232100001232100000","0000122111111221000000","0001222222222222100000","0012222222222222210000","0122211111111112221000","1222144444444441222100","1221444444444444122100","1221444444444444122100","1221444444444444122100","0122144444444441221000","0012211111111112210000","0001222222222222100000","0000144444444441000000","0000144444444441000000","0000144444444441000000","0000014411114410000000","0000001100001100000000"],"bear":["0000111100000111100000","0001233210001233210000","0001333310001333310000","0001233211111233210000","0000111122222111100000","0001222222222222100000","0012222222222222210000","0122211111111112221000","1222144444444441222100","1221444444444444122100","1221444444444444122100","1221444444444444122100","0122144444444441221000","0012211111111112210000","0001222222222222100000","0000144444444441000000","0000144444444441000000","0000144444444441000000","0000014411114410000000","0000001100001100000000"],"cat":["0001100000000001100000","0012210000000012210000","0012321000000123210000","0012332111111123321000","0001122222222221100000","0012222222222222210000","0012222222222222210000","0122211111111112221000","1222144444444441222100","1221444444444444122100","1221444444444444122100","1221444444444444122100","0122144444444441221000","0012211111111112210000","0001222222222222100000","0000144444444441000000","0000144444444441000000","0000144444444441000000","0000014411114410000000","0000001100001100000000"],"frog":["0000000000000000000000","0001111000000111100000","0012222100001222210000","0124422211111122442210","0124422222222222442210","0011122222222222211100","0000122222222222210000","0122211111111112221000","1222144444444441222100","1221444444444444122100","1221444444444444122100","1221444444444444122100","0122144444444441221000","0012211111111112210000","0001222222222222100000","0000144444444441000000","0000144444444441000000","0000144444444441000000","0000014411114410000000","0000001100001100000000"]};
+const PRESETS = [
+  { id: "bunny", label: "Bunny",  p: ["#C59383", "#FFE2E5", "#FFAFC7", "#FFFFFF"] },
+  { id: "bear",  label: "Bear",   p: ["#6B4A3D", "#D9A066", "#E8C39E", "#FFF3E0"] },
+  { id: "cat",   label: "Kitty",  p: ["#544775", "#E3D9F7", "#C7AEEA", "#FFFFFF"] },
+  { id: "frog",  label: "Frog",   p: ["#3B6356", "#A9DFBF", "#F1948A", "#FCF3CF"] },
+].map((x) => ({ ...x, m: PRESET_DATA[x.id].map((r) => [...r].map(Number)) }));
+const LABELS = ["Outline", "Body", "Accent", "Face"];
+const clone = (g) => g.map((r) => r.slice());
+
+const art = $("art"), actx = art.getContext("2d");
+const stage = $("stage"), sctx = stage.getContext("2d");
+const sprite = document.createElement("canvas"); sprite.width = COLS; sprite.height = ROWS;
+const spx = sprite.getContext("2d");
+
+let grid = clone(PRESETS[0].m), pal = PRESETS[0].p.slice();
+let tool = "pen", color = 2, mirror = false;
+let hist = [], redo = [];
+let drawing = false, last = null, strokeVal = 1, changed = false, hover = null;
+let T = { soft: "#f1eafb", line: "#eadff7", accent: "#8f72d8", surface: "#fff" };
+
+function themeChanged() {
+  const cs = getComputedStyle(document.documentElement);
+  T = { soft: cs.getPropertyValue("--soft").trim(), line: cs.getPropertyValue("--line").trim(), accent: cs.getPropertyValue("--accent").trim(), surface: cs.getPropertyValue("--surface").trim() };
+  renderArt();
+}
+matchMedia("(prefers-color-scheme: dark)").addEventListener?.("change", () => { setTimeout(() => { bgColors(); themeChanged(); }, 0); });
+
+function paintInto(ctx, g, p, s) {
+  for (let r = 0; r < ROWS; r++) for (let c = 0; c < COLS; c++) { const v = g[r][c]; if (v) { ctx.fillStyle = p[v - 1]; ctx.fillRect(c * s, r * s, s, s); } }
+}
+function refreshSprite() { spx.clearRect(0, 0, COLS, ROWS); paintInto(spx, grid, pal, 1); }
+
+function renderArt() {
+  const dpr = Math.min(window.devicePixelRatio || 1, 3), w = art.clientWidth;
+  if (!w) return;
+  const W = Math.round(w * dpr), H = Math.round(w * ROWS / COLS * dpr);
+  if (art.width !== W || art.height !== H) { art.width = W; art.height = H; }
+  const cw = W / COLS, ch = H / ROWS;
+  actx.clearRect(0, 0, W, H);
+  // transparent checker, then pixels, then a faint grid
+  actx.fillStyle = T.soft; actx.fillRect(0, 0, W, H);
+  actx.fillStyle = T.line; actx.globalAlpha = .55;
+  for (let r = 0; r < ROWS; r++) for (let c = 0; c < COLS; c++) if ((r + c) & 1) actx.fillRect(c * cw, r * ch, cw, ch);
+  actx.globalAlpha = 1;
+  for (let r = 0; r < ROWS; r++) for (let c = 0; c < COLS; c++) { const v = grid[r][c]; if (v) { actx.fillStyle = pal[v - 1]; actx.fillRect(Math.floor(c * cw), Math.floor(r * ch), Math.ceil(cw), Math.ceil(ch)); } }
+  actx.strokeStyle = "rgba(120,100,170,.16)"; actx.lineWidth = 1; actx.beginPath();
+  for (let c = 0; c <= COLS; c++) { const x = Math.round(c * cw) + .5; actx.moveTo(x, 0); actx.lineTo(x, H); }
+  for (let r = 0; r <= ROWS; r++) { const y = Math.round(r * ch) + .5; actx.moveTo(0, y); actx.lineTo(W, y); }
+  actx.stroke();
+  if (mirror) { actx.save(); actx.setLineDash([6 * dpr, 6 * dpr]); actx.strokeStyle = T.accent; actx.lineWidth = 2 * dpr; actx.beginPath(); actx.moveTo(MIRROR_W / 2 * cw, 0); actx.lineTo(MIRROR_W / 2 * cw, H); actx.stroke(); actx.restore(); }
+  if (hover && !drawing) {
+    actx.strokeStyle = T.accent; actx.lineWidth = 2 * dpr; actx.strokeRect(hover[0] * cw + dpr, hover[1] * ch + dpr, cw - 2 * dpr, ch - 2 * dpr);
+    if (mirror && hover[0] < MIRROR_W) { const mc = MIRROR_W - 1 - hover[0]; actx.globalAlpha = .45; actx.strokeRect(mc * cw + dpr, hover[1] * ch + dpr, cw - 2 * dpr, ch - 2 * dpr); actx.globalAlpha = 1; }
+  }
+}
+
+function cellAt(e) {
+  const r = art.getBoundingClientRect();
+  return [Math.max(0, Math.min(COLS - 1, Math.floor((e.clientX - r.left) / r.width * COLS))), Math.max(0, Math.min(ROWS - 1, Math.floor((e.clientY - r.top) / r.height * ROWS)))];
+}
+function put(c, r, v) {
+  if (grid[r][c] !== v) { grid[r][c] = v; changed = true; }
+  if (mirror && c < MIRROR_W) { const mc = MIRROR_W - 1 - c; if (grid[r][mc] !== v) { grid[r][mc] = v; changed = true; } }
+}
+function line(a, b, v) { // Bresenham, so quick strokes never leave gaps
+  let [x0, y0] = a; const [x1, y1] = b, dx = Math.abs(x1 - x0), dy = -Math.abs(y1 - y0), sx = x0 < x1 ? 1 : -1, sy = y0 < y1 ? 1 : -1; let err = dx + dy;
+  for (;;) { put(x0, y0, v); if (x0 === x1 && y0 === y1) break; const e2 = 2 * err; if (e2 >= dy) { err += dy; x0 += sx; } if (e2 <= dx) { err += dx; y0 += sy; } }
+}
+function flood(c, r, v) {
+  const t = grid[r][c]; if (t === v) return;
+  const q = [[c, r]];
+  while (q.length) { const [x, y] = q.pop(); if (x < 0 || y < 0 || x >= COLS || y >= ROWS || grid[y][x] !== t) continue; grid[y][x] = v; changed = true; q.push([x + 1, y], [x - 1, y], [x, y + 1], [x, y - 1]); }
+}
+
+function pushHist() { hist.push(clone(grid)); if (hist.length > 100) hist.shift(); redo = []; syncBtns(); }
+function afterEdit() { refreshSprite(); renderArt(); syncBtns(); queueSave(); }
+
+art.addEventListener("pointerdown", (e) => {
+  if (e.button === 1) return;
+  e.preventDefault(); art.focus({ preventScroll: true });
+  const [c, r] = cellAt(e);
+  if (tool === "pick" && e.button !== 2) { const v = grid[r][c]; if (v) { setColor(v); } return; }
+  pushHist(); changed = false;
+  if (tool === "fill" && e.button !== 2) { flood(c, r, color); if (!changed) { hist.pop(); syncBtns(); } afterEdit(); return; }
+  art.setPointerCapture(e.pointerId);
+  drawing = true; last = [c, r];
+  strokeVal = (tool === "erase" || e.button === 2) ? 0 : color;
+  put(c, r, strokeVal); afterEdit();
+});
+art.addEventListener("pointermove", (e) => {
+  const cell = cellAt(e);
+  if (drawing) { line(last, cell, strokeVal); last = cell; refreshSprite(); renderArt(); }
+  else if (!hover || hover[0] !== cell[0] || hover[1] !== cell[1]) { hover = cell; renderArt(); }
+});
+const endStroke = () => { if (!drawing) return; drawing = false; if (!changed) hist.pop(); afterEdit(); };
+art.addEventListener("pointerup", endStroke);
+art.addEventListener("pointercancel", endStroke);
+art.addEventListener("pointerleave", () => { hover = null; if (!drawing) renderArt(); });
+art.addEventListener("contextmenu", (e) => e.preventDefault());
+
+function undo() { if (!hist.length) return; redo.push(clone(grid)); grid = hist.pop(); afterEdit(); }
+function redoIt() { if (!redo.length) return; hist.push(clone(grid)); grid = redo.pop(); afterEdit(); }
+function syncBtns() { $("undo").disabled = !hist.length; $("redo").disabled = !redo.length; }
+$("undo").onclick = undo; $("redo").onclick = redoIt;
+$("clear").onclick = () => { pushHist(); grid = grid.map((r) => r.map(() => 0)); afterEdit(); say("Cleared. Undo brings it back."); };
+
+function setTool(t) { tool = t; document.querySelectorAll("[data-tool]").forEach((b) => b.setAttribute("aria-pressed", b.dataset.tool === t)); art.style.cursor = t === "pick" ? "copy" : "crosshair"; }
+document.querySelectorAll("[data-tool]").forEach((b) => (b.onclick = () => setTool(b.dataset.tool)));
+function setMirror(on) { mirror = on; $("mirror").setAttribute("aria-pressed", on); renderArt(); }
+$("mirror").onclick = () => setMirror(!mirror);
+
+document.addEventListener("keydown", (e) => {
+  if (/^(INPUT|TEXTAREA)$/.test(e.target.tagName) && e.target.type !== "color") return;
+  const k = e.key.toLowerCase(), mod = e.ctrlKey || e.metaKey;
+  if (mod && k === "z") { e.preventDefault(); e.shiftKey ? redoIt() : undo(); return; }
+  if (mod && k === "y") { e.preventDefault(); redoIt(); return; }
+  if (mod || e.altKey) return;
+  if (document.activeElement !== art && !document.getElementById("maker").contains(document.activeElement)) return;
+  if (k === "b") setTool("pen"); else if (k === "e") setTool("erase"); else if (k === "f") setTool("fill"); else if (k === "i") setTool("pick"); else if (k === "m") setMirror(!mirror);
+  else if (k >= "1" && k <= "4") setColor(+k);
+});
+
+/* palette */
+function buildPal() {
+  $("pal").innerHTML = pal.map((hex, i) => `<div class="pr" data-on="${color === i + 1}"><button type="button" class="sel" data-c="${i + 1}" aria-pressed="${color === i + 1}"><span class="sw" style="background:${esc(hex)}"></span>${LABELS[i]}</button><input type="color" value="${esc(hex)}" data-p="${i}" aria-label="${LABELS[i]} colour"></div>`).join("");
+}
+function setColor(v) { color = v; if (tool === "erase" || tool === "pick") setTool("pen"); buildPal(); }
+$("pal").addEventListener("click", (e) => { const b = e.target.closest("[data-c]"); if (b) setColor(+b.dataset.c); });
+$("pal").addEventListener("input", (e) => { const i = e.target.dataset.p; if (i == null) return; pal[+i] = e.target.value; e.target.closest(".pr").querySelector(".sw").style.background = e.target.value; refreshSprite(); renderArt(); queueSave(); });
+
+/* presets: loading one is undoable, never destructive */
+$("presets").innerHTML = PRESETS.map((p) => `<button type="button" class="pre" data-id="${p.id}"><canvas width="${COLS}" height="${ROWS}"></canvas>${p.label}</button>`).join("");
+document.querySelectorAll(".pre").forEach((b) => {
+  const p = PRESETS.find((x) => x.id === b.dataset.id), c = b.querySelector("canvas").getContext("2d");
+  paintInto(c, p.m, p.p, 1);
+  b.onclick = () => { pushHist(); grid = clone(p.m); pal = p.p.slice(); buildPal(); afterEdit(); say(`Loaded ${p.label}. Undo goes back to your drawing.`); };
+});
+
+/* ---------- meet your pet (the little game) ---------- */
+let hearts = [], bounce = 0, bounceV = 0, bond = 0, squash = 0, moodTimer = 0;
+const HEART = ["01010", "11111", "11111", "01110", "00100"];
+const S = 8, PW = COLS * S, PH = ROWS * S;
+function say(t) { $("status").textContent = t; }
+function mood(t) { $("mood").textContent = t; clearTimeout(moodTimer); moodTimer = setTimeout(() => ($("mood").textContent = ""), 3500); }
+const petName = () => ($("petname").value.trim() || "Your pet");
+function pat() {
+  bounceV = -5; squash = 1; bond = Math.min(10, bond + 1);
+  const n = reduce ? 2 : 5; for (let i = 0; i < n; i++) hearts.push({ x: stage.width / 2 + (Math.random() - .5) * 80, y: stage.height * .45 + Math.random() * 20, vy: -.5 - Math.random() * .8, vx: (Math.random() - .5) * .6, life: 1 });
+  $("bondlabel").textContent = `♥ ${bond} / 10`; $("bondbar").style.width = bond * 10 + "%";
+  if (bond === 10) { for (let i = 0; i < 14; i++) hearts.push({ x: stage.width / 2 + (Math.random() - .5) * 140, y: stage.height * .5, vy: -.8 - Math.random() * 1.2, vx: (Math.random() - .5) * 1.4, life: 1 }); mood(`${petName()} loves you! ♥`); }
+  else mood(["Mmm!", `${petName()} wiggles.`, "Happy!", `${petName()} likes that.`, "♥"][bond % 5]);
+}
+$("pat").onclick = pat;
+stage.addEventListener("pointerdown", (e) => { const r = stage.getBoundingClientRect(), x = (e.clientX - r.left) / r.width * stage.width, y = (e.clientY - r.top) / r.height * stage.height; const px = (stage.width - PW) / 2 + S, py = stage.height - PH - 38; if (x >= px && x <= px + PW - 2 * S && y >= py - 20 && y <= py + PH) pat(); });
+$("petname").addEventListener("input", queueSave);
+
+let t0 = performance.now();
+function frame(now) {
+  const t = (now - t0) / 1000;
+  const w = stage.width, h = stage.height;
+  // room
+  sctx.fillStyle = T.soft; sctx.fillRect(0, 0, w, h);
+  sctx.globalAlpha = .7; sctx.fillStyle = T.line; sctx.fillRect(0, h - 56, w, 56);
+  sctx.globalAlpha = .35; sctx.fillStyle = T.accent; sctx.fillRect(0, h - 56, w, 2); sctx.globalAlpha = 1;
+  // motion
+  bounceV += .5; bounce += bounceV; if (bounce > 0) { bounce = 0; bounceV = 0; }
+  squash *= .88;
+  const bob = reduce ? 0 : Math.round(Math.sin(t * 3) * 2);
+  const px = (w - PW) / 2 + S, py = h - PH - 38 + bob + bounce;
+  sctx.fillStyle = "rgba(60,40,100,.18)"; sctx.beginPath(); sctx.ellipse(w / 2, h - 38 + PH * 0 + 4, PW / 2.6 - bounce * -.4, 7, 0, 0, 7); sctx.fill();
+  sctx.imageSmoothingEnabled = false;
+  const sq = squash * 6;
+  sctx.drawImage(sprite, 0, 0, COLS, ROWS, px - sq / 2, py + sq, PW + sq, PH - sq);
+  // hearts
+  hearts = hearts.filter((p) => p.life > 0);
+  hearts.forEach((p) => { p.x += p.vx; p.y += p.vy; p.life -= .014; sctx.globalAlpha = Math.max(0, Math.min(1, p.life * 1.4)); sctx.fillStyle = "#ff7ea1"; HEART.forEach((row, ry) => [...row].forEach((v, rx) => v === "1" && sctx.fillRect(Math.round(p.x) + rx * 3, Math.round(p.y) + ry * 3, 3, 3))); });
+  sctx.globalAlpha = 1;
+  requestAnimationFrame(frame);
+}
+
+/* ---------- keep it: autosave, PNG, copy ---------- */
+let saveT = 0;
+function queueSave() { clearTimeout(saveT); saveT = setTimeout(() => { try { localStorage.setItem("gemimi-demo-pet", JSON.stringify({ grid, pal, name: $("petname").value })); } catch {} }, 400); }
+function load() {
+  try {
+    const d = JSON.parse(localStorage.getItem("gemimi-demo-pet") || "null");
+    if (d && Array.isArray(d.grid) && d.grid.length === ROWS && d.grid.every((r) => Array.isArray(r) && r.length === COLS && r.every((v) => Number.isInteger(v) && v >= 0 && v <= 4)) && Array.isArray(d.pal) && d.pal.length === 4 && d.pal.every((x) => /^#[0-9a-f]{6}$/i.test(x))) {
+      grid = d.grid; pal = d.pal; if (typeof d.name === "string") $("petname").value = d.name.slice(0, 16);
+    }
+  } catch {}
+}
+$("png").onclick = () => {
+  const c = document.createElement("canvas"); c.width = COLS * 24; c.height = ROWS * 24; const x = c.getContext("2d"); x.imageSmoothingEnabled = false; x.drawImage(sprite, 0, 0, c.width, c.height);
+  c.toBlob((b) => { const a = document.createElement("a"); a.href = URL.createObjectURL(b); a.download = `${petName().toLowerCase().replace(/[^a-z0-9]+/g, "-") || "pet"}.png`; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 2000); say("Saved as a PNG."); });
+};
+$("copy").onclick = async () => {
+  const palette = { 0: { label: "Eraser", value: "transparent" } }; pal.forEach((v, i) => (palette[i + 1] = { label: LABELS[i], value: v }));
+  const txt = JSON.stringify({ matrix: grid, palette });
+  try { await navigator.clipboard.writeText(txt); say("Copied. It's in the same format the app saves."); }
+  catch { const ta = document.createElement("textarea"); ta.value = txt; document.body.appendChild(ta); ta.select(); try { document.execCommand("copy"); say("Copied."); } catch { say("Couldn't copy here."); } ta.remove(); }
+};
+
+new ResizeObserver(renderArt).observe(art);
+load(); buildPal(); refreshSprite(); syncBtns(); themeChanged();
+requestAnimationFrame(frame);
+
+/* ---------- background: a drifting fractal garden (same as the portfolio) --- */
+let bgColors = () => {};
+(function () {
+  const canvas = $("bg"), ctx = canvas.getContext("2d");
+  const hex = (h) => { const n = parseInt(h.slice(1), 16); return [n >> 16 & 255, n >> 8 & 255, n & 255]; };
+  const mix = (a, b, t) => a + (b - a) * t;
+  const PAL = {
+    peach:    ["#ffd3bf", "#ffe3b8", "#ffc9d6", "#ffd9a8"].map(hex),
+    sage:     ["#cfeccd", "#bfe8d8", "#e2f1b9", "#b4e3c4"].map(hex),
+    peri:     ["#c9d2ff", "#dac8ff", "#bfe0ff", "#d2c4f5"].map(hex),
+    blush:    ["#ffc9de", "#f6c1f0", "#ffd6e6", "#e9bfff"].map(hex),
+    aqua:     ["#b7ecf2", "#c4f2e0", "#bcd8ff", "#a8e6dc"].map(hex),
+    lemon:    ["#fff2a6", "#ffe0b0", "#f9f5b5", "#ffd1b8"].map(hex),
+  };
+  const blobs = [
+    { x: .16, y: .20, r: .34, c: [-.75, .11],       amp: [.03, .03],   sp: .9, ph: 0,   pal: "peach", zoom: 1.45, dx: .05, dy: .04 },
+    { x: .84, y: .16, r: .30, c: [-.5251, .5213],   amp: [.02, .02],   sp: 1.0, ph: 1.2, pal: "aqua",  zoom: 1.5,  dx: .04, dy: .05 },
+    { x: .50, y: .50, r: .36, c: [-.8, .156],       amp: [.04, .05],   sp: .7, ph: 2.4, pal: "peri",  zoom: 1.5,  dx: .06, dy: .03 },
+    { x: .12, y: .78, r: .30, c: [.285, .01],       amp: [.012, .012], sp: 1.1, ph: 3.6, pal: "sage",  zoom: 1.45, dx: .04, dy: .05 },
+    { x: .88, y: .74, r: .33, c: [-.162, 1.04],     amp: [.02, .02],   sp: .8, ph: 4.8, pal: "blush", zoom: 1.55, dx: .05, dy: .04 },
+    { x: .55, y: .95, r: .24, c: [-.70176, -.3842], amp: [.02, .025],  sp: 1.2, ph: 5.9, pal: "lemon", zoom: 1.55, dx: .03, dy: .03 },
+  ];
+  const SZ = 112, MAXIT = 52;
+  blobs.forEach((b) => { b.tile = document.createElement("canvas"); b.tile.width = b.tile.height = SZ; b.tctx = b.tile.getContext("2d"); b.img = b.tctx.createImageData(SZ, SZ); });
+  let base = [255, 249, 246], dark = false;
+  bgColors = () => {
+    const bg = getComputedStyle(document.documentElement).getPropertyValue("--bg").trim();
+    base = /^#[0-9a-f]{6}$/i.test(bg) ? hex(bg) : base;
+    dark = (base[0] * 299 + base[1] * 587 + base[2] * 114) / 1000 < 110;
+    if (reduce) draw(0);
+  };
+  const pal = (st, u) => { const n = st.length, f = (((u % 1) + 1) % 1) * n, i = Math.floor(f), k = f - i, a = st[i % n], b = st[(i + 1) % n]; return [mix(a[0], b[0], k), mix(a[1], b[1], k), mix(a[2], b[2], k)]; };
+  function tile(b, t) {
+    const st = PAL[b.pal], a = t * .1 * b.sp + b.ph;
+    const cr = b.c[0] + b.amp[0] * Math.cos(a), ci = b.c[1] + b.amp[1] * Math.sin(a * 1.3), d = b.img.data;
+    let p = 0;
+    for (let py = 0; py < SZ; py++) { const ny = py / (SZ - 1) * 2 - 1;
+      for (let px = 0; px < SZ; px++) { const nx = px / (SZ - 1) * 2 - 1, dist = Math.hypot(nx, ny), e = Math.max(0, Math.min(1, (.98 - dist) / .5));
+        if (e <= 0) { p += 4; continue; }
+        let x = nx * b.zoom, y = ny * b.zoom, n = 0;
+        while (n < MAXIT) { const xx = x * x, yy = y * y; if (xx + yy > 16) break; y = 2 * x * y + ci; x = xx - yy + cr; n++; }
+        let r, g, bl;
+        if (n >= MAXIT) { r = mix(st[0][0], 255, .4); g = mix(st[0][1], 255, .4); bl = mix(st[0][2], 255, .4); }
+        else { const m = Math.hypot(x, y), sm = n + 1 - Math.log(Math.log(Math.max(m, 1.0001))) / Math.LN2; [r, g, bl] = pal(st, sm * .055 + t * .008 * b.sp); }
+        d[p++] = r; d[p++] = g; d[p++] = bl; d[p++] = 255 * e * e; } }
+    b.tctx.putImageData(b.img, 0, 0);
+  }
+  function size() { const w = Math.round(innerWidth / 1.5), h = Math.round(innerHeight / 1.5); if (canvas.width !== w || canvas.height !== h) { canvas.width = w; canvas.height = h; } }
+  function draw(t) {
+    size();
+    ctx.fillStyle = `rgb(${base[0]},${base[1]},${base[2]})`; ctx.fillRect(0, 0, canvas.width, canvas.height);
+    const short = Math.min(canvas.width, canvas.height);
+    ctx.save(); ctx.globalAlpha = dark ? .38 : .8; ctx.globalCompositeOperation = dark ? "screen" : "source-over"; ctx.imageSmoothingQuality = "high";
+    try { ctx.filter = "blur(4px)"; } catch {}
+    blobs.forEach((b) => {
+      tile(b, t);
+      const side = b.r * 2 * short * 1.3, ox = Math.sin(t * .05 + b.ph) * b.dx, oy = Math.cos(t * .04 + b.ph * 1.7) * b.dy;
+      ctx.drawImage(b.tile, (b.x + ox) * canvas.width - side / 2, (b.y + oy) * canvas.height - side / 2, side, side);
+    });
+    ctx.restore();
+  }
+  let lastT = 0;
+  function loop(now) { if (now - lastT > 90) { lastT = now; draw(now / 1000); } requestAnimationFrame(loop); }
+  bgColors();
+  if (reduce) { draw(0); addEventListener("resize", () => draw(0)); } else requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>
